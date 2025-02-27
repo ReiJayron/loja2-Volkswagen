@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volkswagen Peças Automotivas</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --vw-blue: #001E50;
+            --vw-light-blue: #1D72F7;
+            --vw-light-bg: #FFFFFF;
+            --vw-dark-bg: #181818;
+            --vw-light-text: #333333;
+            --vw-dark-text: #F3F4F6;
+            --vw-gray: #EEEEEE;
+            --vw-dark-gray: #2D2D2D;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: var(--vw-dark-bg);
+                color: var(--vw-dark-text);
+            }
+            .product-card {
+                background-color: var(--vw-dark-gray);
+                border-color: #3D3D3D;
+            }
+            .cart-container {
+                background-color: var(--vw-dark-gray);
+                border-color: #3D3D3D;
+            }
+            .category-btn.active {
+                background-color: var(--vw-light-blue);
+                color: white;
+            }
+            .category-btn {
+                background-color: var(--vw-dark-gray);
+                border-color: #3D3D3D;
+                color: var(--vw-dark-text);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            body {
+                background-color: var(--vw-light-bg);
+                color: var(--vw-light-text);
+            }
+            .product-card {
+                background-color: white;
+                border-color: #E5E7EB;
+            }
+            .cart-container {
+                background-color: white;
+                border-color: #E5E7EB;
+            }
+            .category-btn.active {
+                background-color: var(--vw-blue);
+                color: white;
+            }
+            .category-btn {
+                background-color: #F9FAFB;
+                border-color: #E5E7EB;
+                color: var(--vw-light-text);
+            }
+        }
+
+        .vw-btn {
+            background-color: var(--vw-blue);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .vw-btn:hover {
+            background-color: var(--vw-light-blue);
+        }
+
+        .vw-badge {
+            background-color: var(--vw-blue);
+            color: white;
+        }
+
+        .product-img {
+            height: 160px;
+            object-fit: contain;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--vw-blue);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .category-btn {
+            transition: all 0.3s ease;
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--vw-blue);
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: var(--vw-light-blue);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+    <div class="container mx-auto max-w-6xl">
+        <!-- Cabeçalho -->
+        <header class="flex flex-col md:flex-row items-center justify-between mb-8">
+            <div class="flex items-center mb-4 md:mb-0">
+                <svg class="h-10 w-10 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="11" fill="#001E50"/>
+                    <path d="M12 3C7.03 3 3 7.03 3 12C3 16.97 7.03 21 12 21C16.97 21 21 16.97 21 12C21 7.03 16.97 3 12 3ZM12 19.5C7.86 19.5 4.5 16.14 4.5 12C4.5 7.86 7.86 4.5 12 4.5C16.14 4.5 19.5 7.86 19.5 12C19.5 16.14 16.14 19.5 12 19.5Z" fill="white"/>
+                    <path d="M7.5 11.25H16.5V12.75H7.5V11.25Z" fill="white"/>
+                    <path d="M11.25 7.5H12.75V16.5H11.25V7.5Z" fill="white"/>
+                </svg>
+                <h1 class="text-2xl md:text-3xl font-bold">Volkswagen Peças</h1>
+            </div>
+            <div class="flex items-center">
+                <button id="showCartBtn" class="relative vw-btn rounded-lg px-4 py-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Carrinho
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-5 w-5 flex items-center justify-center text-xs">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Barra de pesquisa -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="flex-grow">
+                    <label for="search" class="block text-sm font-medium mb-2">Buscar peças:</label>
+                    <input 
+                        type="text" 
+                        id="search" 
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                        placeholder="Digite o nome ou código da peça...">
+                </div>
+                <div class="flex-shrink-0 flex items-end">
+                    <button 
+                        id="searchBtn" 
+                        class="vw-btn font-medium rounded-lg text-base px-5 py-2.5 focus:outline-none h-[42px]">
+                        Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categorias -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold mb-4">Categorias</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <button class="category-btn active rounded-lg py-2 px-3 text-center text-sm font-medium" data-category="todos">Todos</button>
+                <button class="category-btn rounded-lg py-2 px-3 text-center text-sm font-medium" data-category="motor">Motor</button>
+                <button class="category-btn rounded-lg py-2 px-3 text-center text-sm font-medium" data-category="freios">Freios</button>
+                <button class="category-btn rounded-lg py-2 px-3 text-center text-sm font-medium" data-category="suspensao">Suspensão</button>
+                <button class="category-btn rounded-lg py-2 px-3 text-center text-sm font-medium" data-category="eletrica">Elétrica</button>
+                <button class="category-btn rounded-lg py-2 px-3 text-center text-sm font-medium" data-category="acessorios">Acessórios</button>
+            </div>
+        </div>
+
+        <!-- Carregando -->
+        <div id="loadingContainer" class="hidden text-center my-8">
+            <div class="spinner mx-auto mb-4"></div>
+            <p class="text-lg">Carregando produtos...</p>
+        </div>
+
+        <!-- Lista de produtos -->
+        <div id="productsContainer">
+            <h2 class="text-xl font-bold mb-4">Produtos</h2>
+            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Produtos são adicionados aqui dinamicamente -->
+            </div>
+            <div id="noResults" class="hidden text-center py-8">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-xl font-medium">Nenhum produto encontrado</p>
+                <p class="text-gray-500 dark:text-gray-400">Tente uma busca diferente ou selecione outra categoria</p>
+            </div>
+        </div>
+
+        <!-- Modal de carrinho -->
+        <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="cart-container rounded-lg shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto mx-4">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold">Seu Carrinho</h3>
+                        <button id="closeCartBtn" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div id="cartItems" class="space-y-4 mb-6">
+                        <!-- Itens do carrinho são adicionados aqui -->
+                    </div>
+                    
+                    <div id="emptyCart" class="text-center py-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <p class="text-xl font-medium">Seu carrinho está vazio</p>
+                        <p class="text-gray-500 dark:text-gray-400">Adicione produtos para continuar</p>
+                    </div>
+                    
+                    <div class="border-t pt-4 border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between font-bold text-lg mb-6">
+                            <span>Total:</span>
+                            <span id="cartTotal">R$ 0,00</span>
+                        </div>
+                        
+                        <button id="checkoutBtn" class="w-full vw-btn font-medium rounded-lg text-base px-5 py-2.5 focus:outline-none">
+                            Finalizar Compra
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de sucesso da compra -->
+        <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-md w-full mx-4 p-6">
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+                        <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Compra Realizada com Sucesso!</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-6">Obrigado pela sua compra. Você receberá um e-mail com os detalhes do pedido em breve.</p>
+                    <button id="closeSuccessBtn" class="vw-btn font-medium rounded-lg text-base px-5 py-2.5 focus:outline-none">
+                        Continuar Comprando
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos da UI
+            const searchInput = document.getElementById('search');
+            const searchBtn = document.getElementById('searchBtn');
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            const productsGrid = document.getElementById('productsGrid');
+            const noResults = document.getElementById('noResults');
+            const loadingContainer = document.getElementById('loadingContainer');
+            const cartCount = document.getElementById('cartCount');
+            const cartItems = document.getElementById('cartItems');
+            const emptyCart = document.getElementById('emptyCart');
+            const cartTotal = document.getElementById('cartTotal');
+            const showCartBtn = document.getElementById('showCartBtn');
+            const closeCartBtn = document.getElementById('closeCartBtn');
+            const cartModal = document.getElementById('cartModal');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            const successModal = document.getElementById('successModal');
+            const closeSuccessBtn = document.getElementById('closeSuccessBtn');
+            
+            // Estado da aplicação
+            let currentCategory = 'todos';
+            let searchTerm = '';
+            let products = [];
+            let cart = [];
+            
+            // Produtos da Volkswagen
+            const vwProducts = [
+                {
+                    id: 1,
+                    name: "Filtro de Óleo Original",
+                    category: "motor",
+                    price: 89.90,
+                    code: "04E115561H",
+                    image: "https://i.imgur.com/ZkEm3Lx.png",
+                    description: "Filtro de óleo genuíno para motores EA211, compatível com Golf, Jetta, Polo e Virtus."
+                },
+                {
+                    id: 2,
+                    name: "Pastilha de Freio Dianteira",
+                    category: "freios",
+                    price: 249.90,
+                    code: "5Q0698151A",
+                    image: "https://i.imgur.com/zMZY94f.png",
+                    description: "Jogo de pastilhas de freio dianteiras para veículos com freio a disco. Compatível com Golf, Jetta e Tiguan."
+                },
+                {
+                    id: 3,
+                    name: "Amortecedor Traseiro",
+                    category: "suspensao",
+                    price: 489.90,
+                    code: "5Q0513025G",
+                    image: "https://i.imgur.com/jOLJYMm.png",
+                    description: "Amortecedor traseiro original para maior estabilidade. Compatível com Golf e Jetta."
+                },
+                {
+                    id: 4,
+                    name: "Alternador 90A",
+                    category: "eletrica",
+                    price: 1299.90,
+                    code: "04E903023K",
+                    image: "https://i.imgur.com/Uo2OTux.png",
+                    description: "Alternador de 90 amperes para sistemas elétricos. Compatível com Gol, Voyage e Fox."
+                },
+                {
+                    id: 5,
+                    name: "Kit Embreagem Completo",
+                    category: "motor",
+                    price: 789.90,
+                    code: "0A5141671F",
+                    image: "https://i.imgur.com/8LZj1WL.png",
+                    description: "Kit completo de embreagem com platô, disco e rolamento. Compatível com Gol, Saveiro e Voyage."
+                },
+                {
+                    id: 6,
+                    name: "Bateria 60Ah Original",
+                    category: "eletrica",
+                    price: 599.90,
+                    code: "000915105DI",
+                    image: "https://i.imgur.com/Fdt37m3.png",
+                    description: "Bateria original de 60Ah com garantia de 12 meses. Compatível com diversos modelos Volkswagen."
+                },
+                {
+                    id: 7,
+                    name: "Kit Farol de Milha",
+                    category: "eletrica",
+                    price: 499.90,
+                    code: "5U7052186",
+                    image: "https://i.imgur.com/Gp9ovBB.png",
+                    description: "Kit completo de farol de milha com lâmpadas e chicote. Compatível com Fox e Gol G6."
+                },
+                {
+                    id: 8,
+                    name: "Disco de Freio Ventilado",
+                    category: "freios",
+                    price: 329.90,
+                    code: "6Q0615301D",
+                    image: "https://i.imgur.com/6zTXJ57.png",
+                    description: "Par de discos de freio dianteiros ventilados. Compatível com Polo e Virtus."
+                },
+                {
+                    id: 9,
+                    name: "Tapete Carpete Original",
+                    category: "acessorios",
+                    price: 239.90,
+                    code: "5U7061420WGK",
+                    image: "https://i.imgur.com/xaI9PsI.png",
+                    description: "Jogo de tapetes em carpete com logo bordado. Compatível com Gol e Voyage."
+                },
+                {
+                    id: 10,
+                    name: "Kit Correia Dentada",
+                    category: "motor",
+                    price: 459.90,
+                    code: "04E198119E",
+                    image: "https://i.imgur.com/gVvygLy.png",
+                    description: "Kit completo com correia dentada, tensionador e polias. Compatível com motores EA211."
+                },
+                {
+                    id: 11,
+                    name: "Sensor de Estacionamento",
+                    category: "eletrica",
+                    price: 399.90,
+                    code: "5Q0919275",
+                    image: "https://i.imgur.com/qx2dDQN.png",
+                    description: "Kit com 4 sensores de estacionamento originais. Compatível com diversos modelos."
+                },
+                {
+                    id: 12,
+                    name: "Terminal de Direção",
+                    category: "suspensao",
+                    price: 179.90,
+                    code: "6Q0423811B",
+                    image: "https://i.imgur.com/A7rJxVP.png",
+                    description: "Terminal de direção original para maior segurança. Compatível com Gol, Fox e Polo."
+                },
+                {
+                    id: 13,
+                    name: "Coifa Homocinética",
+                    category: "suspensao",
+                    price: 89.90,
+                    code: "6Q0498203A",
+                    image: "https://i.imgur.com/v5Ib1LY.png",
+                    description: "Coifa para homocinética lado roda. Protege contra entrada de impurezas."
+                },
+                {
+                    id: 14,
+                    name: "Calota Aro 15",
+                    category: "acessorios",
+                    price: 159.90,
+                    code: "5U7071455",
+                    image: "https://i.imgur.com/yU1Uxx9.png",
+                    description: "Jogo de calotas originais aro 15 com logo VW. Conjunto com 4 peças."
+                },
+                {
+                    id: 15,
+                    name: "Filtro de Ar Motor",
+                    category: "motor",
+                    price: 79.90,
+                    code: "5Q0129620D",
+                    image: "https://i.imgur.com/6QSgGNx.png",
+                    description: "Filtro de ar genuíno para proteção do motor. Compatível com Polo, Virtus e T-Cross."
+                },
+                {
+                    id: 16,
+                    name: "Vela de Ignição",
+                    category: "motor",
+                    price: 189.90,
+                    code: "04E905612D",
+                    image: "https://i.imgur.com/2fYRpMR.png",
+                    description: "Jogo com 4 velas de ignição originais para maior desempenho. Compatível com motores TSI."
+                }
+            ];
+            
+            // Inicializar produtos
+            products = vwProducts;
+            
+            // Função para formatar preço
+            function formatPrice(price) {
+                return 'R$ ' + price.toFixed(2).replace('.', ',');
+            }
+            
+            // Função para renderizar produtos
+            function renderProducts() {
+                productsGrid.innerHTML = '';
+                
+                // Filtrar produtos
+                let filteredProducts = products;
+                
+                if (currentCategory !== 'todos') {
+                    filteredProducts = filteredProducts.filter(p => p.category === currentCategory);
+                }
+                
+                if (searchTerm) {
+                    const term = searchTerm.toLowerCase();
+                    filteredProducts = filteredProducts.filter(p => 
+                        p.name.toLowerCase().includes(term) || 
+                        p.code.toLowerCase().includes(term) ||
+                        p.description.toLowerCase().includes(term)
+                    );
+                }
+                
+                // Mostrar mensagem se não houver resultados
+                if (filteredProducts.length === 0) {
+                    noResults.classList.remove('hidden');
+                } else {
+                    noResults.classList.add('hidden');
+                    
+                    // Renderizar produtos
+                    filteredProducts.forEach(product => {
+                        const productCard = document.createElement('div');
+                        productCard.className = 'product-card rounded-lg shadow-md overflow-hidden border';
+                        
+                        productCard.innerHTML = `
+                            <div class="p-4">
+                                <div class="h-40 flex items-center justify-center mb-4">
+                                    <img src="${product.image}" alt="${product.name}" class="product-img">
+                                </div>
+                                <h3 class="font-bold text-lg mb-1">${product.name}</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Código: ${product.code}</p>
+                                <p class="text-sm mb-4">${product.description}</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-lg">${formatPrice(product.price)}</span>
+                                    <button class="add-to-cart-btn rounded-lg px-3 py-1.5 text-sm font-medium" data-id="${product.id}">
+                                        Adicionar
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        productsGrid.appendChild(productCard);
+                    });
+                    
+                    // Adicionar event listeners para botões de adicionar ao carrinho
+                    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const productId = parseInt(this.getAttribute('data-id'));
+                            addToCart(productId);
+                        });
+                    });
+                }
+            }
+            
+            // Função para adicionar produto ao carrinho
+            function addToCart(productId) {
+                const product = products.find(p => p.id === productId);
+                
+                if (product) {
+                    // Verificar se o produto já está no carrinho
+                    const existingItem = cart.find(item => item.id === productId);
+                    
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                    } else {
+                        cart.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image,
+                            quantity: 1
+                        });
+                    }
+                    
+                    updateCart();
+                    
+                    // Mostrar animação de feedback
+                    const button = document.querySelector(`.add-to-cart-btn[data-id="${productId}"]`);
+                    const originalText = button.textContent;
+                    button.textContent = "Adicionado!";
+                    button.style.backgroundColor = "#10B981";
+                    
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.backgroundColor = "";
+                    }, 1000);
+                }
+            }
+            
+            // Função para atualizar o carrinho
+            function updateCart() {
+                // Atualizar contador
+                cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+                
+                // Atualizar lista de itens
+                cartItems.innerHTML = '';
+                
+                if (cart.length === 0) {
+                    emptyCart.classList.remove('hidden');
+                } else {
+                    emptyCart.classList.add('hidden');
+                    
+                    // Renderizar itens do carrinho
+                    cart.forEach(item => {
+                        const cartItem = document.createElement('div');
+                        cartItem.className = 'flex items-center justify-between';
+                        
+                        cartItem.innerHTML = `
+                            <div class="flex items-center">
+                                <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain mr-4">
+                                <div>
+                                    <h4 class="font-medium">${item.name}</h4>
+                                    <div class="flex items-center mt-1">
+                                        <button class="decrement-btn text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-id="${item.id}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <span class="mx-2">${item.quantity}</span>
+                                        <button class="increment-btn text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" data-id="${item.id}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-medium">${formatPrice(item.price * item.quantity)}</p>
+                                <button class="remove-item-btn text-red-500 hover:text-red-700 text-sm mt-1" data-id="${item.id}">
+                                    Remover
+                                </button>
+                            </div>
+                        `;
+                        
+                        cartItems.appendChild(cartItem);
+                    });
+                    
+                    // Adicionar event listeners
+                    document.querySelectorAll('.increment-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const productId = parseInt(this.getAttribute('data-id'));
+                            incrementCartItem(productId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.decrement-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const productId = parseInt(this.getAttribute('data-id'));
+                            decrementCartItem(productId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.remove-item-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const productId = parseInt(this.getAttribute('data-id'));
+                            removeCartItem(productId);
+                        });
+                    });
+                }
+                
+                // Atualizar total
+                const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+                cartTotal.textContent = formatPrice(total);
+            }
+            
+            // Funções para manipular o carrinho
+            function incrementCartItem(productId) {
+                const item = cart.find(item => item.id === productId);
+                if (item) {
+                    item.quantity += 1;
+                    updateCart();
+                }
+            }
+            
+            function decrementCartItem(productId) {
+                const item = cart.find(item => item.id === productId);
+                if (item && item.quantity > 1) {
+                    item.quantity -= 1;
+                    updateCart();
+                } else if (item) {
+                    removeCartItem(productId);
+                }
+            }
+            
+            function removeCartItem(productId) {
+                cart = cart.filter(item => item.id !== productId);
+                updateCart();
+            }
+            
+            // Event listeners
+            searchBtn.addEventListener('click', function() {
+                searchTerm = searchInput.value.trim();
+                renderProducts();
+            });
+            
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    searchTerm = searchInput.value.trim();
+                    renderProducts();
+                }
+            });
+            
+            categoryBtns.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Atualizar estilo dos botões
+                    categoryBtns.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Atualizar categoria atual
+                    currentCategory = this.getAttribute('data-category');
+                    renderProducts();
+                });
+            });
+            
+            // Carrinho modal
+            showCartBtn.addEventListener('click', function() {
+                cartModal.classList.remove('hidden');
+            });
+            
+            closeCartBtn.addEventListener('click', function() {
+                cartModal.classList.add('hidden');
+            });
+            
+            // Fechamento do modal ao clicar fora
+            cartModal.addEventListener('click', function(e) {
+                if (e.target === cartModal) {
+                    cartModal.classList.add('hidden');
+                }
+            });
+            
+            // Finalizar compra
+            checkoutBtn.addEventListener('click', function() {
+                if (cart.length > 0) {
+                    // Mostrar mensagem de sucesso
+                    successModal.classList.remove('hidden');
+                    // Limpar carrinho
+                    cart = [];
+                    updateCart();
+                    // Fechar modal do carrinho
+                    cartModal.classList.add('hidden');
+                }
+            });
+            
+            closeSuccessBtn.addEventListener('click', function() {
+                successModal.classList.add('hidden');
+            });
+            
+            // Fechamento do modal de sucesso ao clicar fora
+            successModal.addEventListener('click', function(e) {
+                if (e.target === successModal) {
+                    successModal.classList.add('hidden');
+                }
+            });
+            
+            // Simulação de carregamento inicial
+            loadingContainer.classList.remove('hidden');
+            setTimeout(() => {
+                loadingContainer.classList.add('hidden');
+                renderProducts();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
